@@ -1,0 +1,28 @@
+if ($this->input->post('submit')) {
+            $path = './assets/uploads/';
+            require_once APPPATH . "/third_party/PHPExcel.php";
+            $config['upload_path'] = $path;
+            $config['allowed_types'] = 'xlsx|xls|txt|jpeg|jpg|xml';
+            $config['remove_spaces'] = TRUE;
+            $this->load->library('upload', $config);
+            $this->upload->initialize($config);            
+            if (!$this->upload->do_upload('uploadFile')) {
+                $error = array('error' => $this->upload->display_errors());
+            } else {
+                $data = array('upload_data' => $this->upload->data());
+            }
+            if(empty($error)){
+              if (!empty($data['upload_data']['file_name'])) {
+                $import_xls_file = $data['upload_data']['file_name'];
+            } else {
+                $import_xls_file = 0;
+            }
+            $inputFileName = $path . $import_xls_file;
+            $this->utilisateur_model->importTache($inputFileName,$idtache,$description);
+            $data['page'] ="ajoutFichierTache";
+            $data['message'] = "Ajout de fichier avec succès";
+            $data['idtache'] =$idtache;
+            $this->load->view('index',$data);
+          }else{
+              echo $error['error'];
+          } 
